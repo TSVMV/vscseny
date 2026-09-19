@@ -1,0 +1,4 @@
+/dist/
+*.exe
+/vscseny
+config.json
