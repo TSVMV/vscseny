@@ -10,24 +10,29 @@ your OS and run it; no runtime is required.
 
 ## Download and run
 
-Get the files from the repository **Releases** page (Assets):
+Download from the [Releases page](https://github.com/TSVMV/vscseny/releases):
 
-- Windows: `vscseny.exe`
-- Linux: `vscseny`
+- Windows: `vscseny-windows-amd64.zip` (contains `vscseny-windows-amd64.exe`)
+- Linux: `vscseny-linux-amd64.zip` (contains `vscseny-linux-amd64`)
+
+Direct download links:
+
+- https://github.com/TSVMV/vscseny/releases/download/v0.1.0/vscseny-windows-amd64.zip
+- https://github.com/TSVMV/vscseny/releases/download/v0.1.0/vscseny-linux-amd64.zip
 
 ### Windows
 
-1. Download `vscseny.exe`.
+1. Download `vscseny-windows-amd64.zip` and extract it.
 2. Open a terminal (or cmd) and run:
 
 ```bat
-vscseny.exe C:\path\to\your\project
+vscseny-windows-amd64.exe C:\path\to\your\project
 ```
 
 ### Linux
 
-1. Download `vscseny`.
-2. `chmod +x vscseny && ./vscseny /path/to/your/project`
+1. Download `vscseny-linux-amd64.zip` and extract it.
+2. `chmod +x vscseny-linux-amd64 && ./vscseny-linux-amd64 /path/to/your/project`
 
 ## Usage
 
