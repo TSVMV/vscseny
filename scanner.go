@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"unicode/utf8"
 )
 
 // extLanguage maps file extensions to a canonical language name.
@@ -144,10 +145,7 @@ func scanLine(line []byte, rel string, lineNo int, rules []*Rule) []Finding {
 		if loc == nil {
 			continue
 		}
-		code := bytes.TrimSpace(trimmed)
-		if len(code) > 180 {
-			code = code[:180]
-		}
+		code := clipSnippet(bytes.TrimSpace(trimmed), 180)
 		col := runeIndex(lineStr, loc[0]) + 1
 		findings = append(findings, Finding{
 			File:     rel,
@@ -180,6 +178,19 @@ func readLine(r *bufio.Reader) ([]byte, error) {
 		}
 		return out, err // io.EOF or real error
 	}
+}
+
+// clipSnippet truncates s to at most max bytes without splitting a UTF-8
+// rune, keeping snippets valid in JSON and terminal output.
+func clipSnippet(s []byte, max int) []byte {
+	if len(s) <= max {
+		return s
+	}
+	s = s[:max]
+	for len(s) > 0 && !utf8.Valid(s) {
+		s = s[:len(s)-1]
+	}
+	return s
 }
 
 func runeIndex(s string, byteIdx int) int {

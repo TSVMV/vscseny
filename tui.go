@@ -290,7 +290,8 @@ func (c *ui) renderList() {
 func (c *ui) renderDetail() {
 	clearScreen(c.writer)
 	if c.detail < 0 || c.detail >= len(c.visible) {
-		c.detail = 0
+		c.detail = -1
+		return
 	}
 	f := c.visible[c.detail]
 	fmt.Fprintln(c.writer, c.paint("\033[1m", "VSCSENY "+version)+"   detail "+fmt.Sprintf("(%d/%d)", c.detail+1, len(c.visible)))
