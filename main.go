@@ -31,7 +31,11 @@ func main() {
 		fmt.Fprintln(os.Stderr, "options:")
 		fs.PrintDefaults()
 	}
-	if err := fs.Parse(os.Args[1:]); err != nil {
+	// flag.Parse stops at the first non-flag argument, so a documented call
+	// like "vscseny <path> --json" would silently drop every flag after the
+	// path.  Move flags to the front first; every flag here is a boolean
+	// without a value, so reordering is safe.
+	if err := fs.Parse(reorderFlags(os.Args[1:])); err != nil {
 		os.Exit(2)
 	}
 	if *showHelp {
@@ -73,10 +77,9 @@ func main() {
 	}
 
 	var findings []Finding
-	var byExt map[string]int
 	progress := progressPrinter(mode == "tui")
 	if info.IsDir() {
-		findings, byExt, err = scanDirProgress(target, progress)
+		findings, _, err = scanDirProgress(target, progress)
 	} else {
 		lang, ok := extLanguage[strings.ToLower(filepath.Ext(target))]
 		if !ok {
@@ -84,13 +87,11 @@ func main() {
 			os.Exit(2)
 		}
 		findings, err = scanFile(target, target, lang)
-		byExt = map[string]int{lang: 1}
 	}
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "vscseny: scan failed: %v\n", err)
 		os.Exit(1)
 	}
-	_ = byExt
 	if progress != nil {
 		fmt.Fprintln(os.Stderr)
 	}
@@ -117,6 +118,22 @@ func isTerminal(f *os.File) bool {
 		return false
 	}
 	return fi.Mode()&os.ModeCharDevice != 0
+}
+
+// reorderFlags moves every flag argument ahead of the positional arguments so
+// flag.Parse still sees them after a path, e.g. "vscseny dir --json".  A lone
+// "-" is kept in place as it conventionally means stdin.
+func reorderFlags(args []string) []string {
+	flags := make([]string, 0, len(args))
+	rest := make([]string, 0, len(args))
+	for _, a := range args {
+		if strings.HasPrefix(a, "-") && a != "-" {
+			flags = append(flags, a)
+		} else {
+			rest = append(rest, a)
+		}
+	}
+	return append(flags, rest...)
 }
 
 func progressPrinter(enabled bool) Progress {

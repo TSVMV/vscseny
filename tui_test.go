@@ -110,6 +110,29 @@ func runDriven(c *ui) {
 	}
 }
 
+func TestRenderDetailEmptyVisible(t *testing.T) {
+	c := newUI(".", []Finding{}, false)
+	c.writer = &bytes.Buffer{}
+	c.detail = 0
+	c.renderDetail()
+	if c.detail != -1 {
+		t.Fatalf("detail after empty render = %d", c.detail)
+	}
+}
+
+func TestReorderFlags(t *testing.T) {
+	got := reorderFlags([]string{"dir", "--json", "--no-color", "-", "x.py"})
+	want := []string{"--json", "--no-color", "dir", "-", "x.py"}
+	if len(got) != len(want) {
+		t.Fatalf("reorderFlags(%v) = %v", got, want)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("reorderFlags = %v, want %v", got, want)
+		}
+	}
+}
+
 func TestSortToggle(t *testing.T) {
 	c := newUI(".", sampleFindings(), false)
 	c.writer = &bytes.Buffer{}
